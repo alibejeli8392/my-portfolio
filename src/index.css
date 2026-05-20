@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer utilities {
+  /* Semantic background roles mapped to subtle neutral palette tokens. */
+  .bg-page {
+    background-color: #ffffff; /* white */
+  }
+
+  .bg-section {
+    background-color: #f8fafc; /* slate-50 */
+  }
+
+  .bg-section-alt {
+    background-color: #f1f5f9; /* slate-100 */
+  }
+}
+
+@layer base {
+  html {
+    @apply h-full scroll-smooth antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-full overflow-x-hidden text-[#1C1E53];
+    background-color: #ffffff;
+  }
+
+  #root {
+    @apply flex min-h-dvh w-full max-w-none flex-col overflow-x-hidden;
+  }
+}

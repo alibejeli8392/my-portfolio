@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://my-portfolio-83fj1d6ix-alibejeli8392s-projects.vercel.app/sitemap.xml
