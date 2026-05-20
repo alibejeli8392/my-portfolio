@@ -61,6 +61,8 @@ const HeroSection = () => (
         <img
           src={heroImg}
           alt="Ali Bejeli, Frontend Engineer"
+          width="800"
+          height="600"
           className="w-full max-w-md md:max-w-lg h-auto object-contain rounded-3xl shadow-lg"
         />
       </motion.div>

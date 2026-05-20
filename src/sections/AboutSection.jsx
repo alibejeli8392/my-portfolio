@@ -22,6 +22,8 @@ const AboutSection = () => (
           <img
             src={aboutImg}
             alt="Ali Bejeli working as a Frontend Engineer"
+            width="736"
+            height="736"
             className="w-full max-w-sm md:max-w-md h-auto object-cover rounded-3xl shadow-lg"
           />
         </div>

@@ -30,9 +30,16 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+        },
+      },
       rollupOptions: {
         treeshake: {
           moduleSideEffects: false,
+          propertyReadSideEffects: false,
         },
         output: {
           manualChunks(id) {

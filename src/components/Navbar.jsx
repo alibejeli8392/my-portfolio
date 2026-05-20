@@ -21,61 +21,38 @@ const Navbar = () => {
   }, [])
 
   useEffect(() => {
-    const sections = navItems
-      .map(({ sectionId }) => document.getElementById(sectionId))
-      .filter(Boolean)
+    let cleanupObserver = () => {}
 
-    if (!sections.length) return undefined
+    const setup = () => {
+      const sections = navItems
+        .map(({ sectionId }) => document.getElementById(sectionId))
+        .filter(Boolean)
 
-    const getSectionFromScroll = () => {
-      const offset = 120
-      const current = sections.find((section) => {
-        const rect = section.getBoundingClientRect()
-        return rect.top <= offset && rect.bottom > offset
-      })
-      return current?.id
-    }
+      if (!sections.length) return
 
-    const getValidHashSection = () => {
-      const sectionId = window.location.hash.replace('#', '')
-      return navItems.some((item) => item.sectionId === sectionId) ? sectionId : ''
-    }
-
-    const syncInitialActiveSection = () => {
-      const hashSection = getValidHashSection()
-      if (hashSection) {
-        setActiveSection(hashSection)
-        return
+      const getSectionFromScroll = () => {
+        const offset = 120
+        const current = sections.find((section) => {
+          const rect = section.getBoundingClientRect()
+          return rect.top <= offset && rect.bottom > offset
+        })
+        return current?.id
       }
 
-      if (window.scrollY <= 8) {
-        setActiveSection('home')
-        return
+      const getValidHashSection = () => {
+        const sectionId = window.location.hash.replace('#', '')
+        return navItems.some((item) => item.sectionId === sectionId) ? sectionId : ''
       }
 
-      const sectionFromScroll = getSectionFromScroll()
-      if (sectionFromScroll) {
-        setActiveSection(sectionFromScroll)
-      }
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (window.scrollY <= 8) {
-          setActiveSection('home')
+      const syncInitialActiveSection = () => {
+        const hashSection = getValidHashSection()
+        if (hashSection) {
+          setActiveSection(hashSection)
           return
         }
 
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              Math.abs(a.boundingClientRect.top) -
-              Math.abs(b.boundingClientRect.top)
-          )
-
-        if (visibleEntries.length > 0) {
-          setActiveSection(visibleEntries[0].target.id)
+        if (window.scrollY <= 8) {
+          setActiveSection('home')
           return
         }
 
@@ -83,38 +60,73 @@ const Navbar = () => {
         if (sectionFromScroll) {
           setActiveSection(sectionFromScroll)
         }
-      },
-      {
-        root: null,
-        rootMargin: '-20% 0px -65% 0px',
-        threshold: [0.1, 0.2, 0.4, 0.6],
-      }
-    )
-
-    sections.forEach((section) => observer.observe(section))
-
-    const syncFromHash = () => {
-      const sectionId = getValidHashSection()
-      if (sectionId) {
-        setActiveSection(sectionId)
-        return
       }
 
-      if (window.scrollY <= 8) {
-        setActiveSection('home')
-        return
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (window.scrollY <= 8) {
+            setActiveSection('home')
+            return
+          }
+
+          const visibleEntries = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort(
+              (a, b) =>
+                Math.abs(a.boundingClientRect.top) -
+                Math.abs(b.boundingClientRect.top)
+            )
+
+          if (visibleEntries.length > 0) {
+            setActiveSection(visibleEntries[0].target.id)
+            return
+          }
+
+          const sectionFromScroll = getSectionFromScroll()
+          if (sectionFromScroll) {
+            setActiveSection(sectionFromScroll)
+          }
+        },
+        {
+          root: null,
+          rootMargin: '-20% 0px -65% 0px',
+          threshold: [0.1, 0.2, 0.4, 0.6],
+        }
+      )
+
+      sections.forEach((section) => observer.observe(section))
+
+      const syncFromHash = () => {
+        const sectionId = getValidHashSection()
+        if (sectionId) {
+          setActiveSection(sectionId)
+          return
+        }
+
+        if (window.scrollY <= 8) {
+          setActiveSection('home')
+          return
+        }
+
+        const sectionFromScroll = getSectionFromScroll()
+        if (sectionFromScroll) setActiveSection(sectionFromScroll)
       }
 
-      const sectionFromScroll = getSectionFromScroll()
-      if (sectionFromScroll) setActiveSection(sectionFromScroll)
+      syncInitialActiveSection()
+      window.addEventListener('hashchange', syncFromHash)
+
+      cleanupObserver = () => {
+        observer.disconnect()
+        window.removeEventListener('hashchange', syncFromHash)
+      }
     }
 
-    syncInitialActiveSection()
-    window.addEventListener('hashchange', syncFromHash)
+    // Yield this work so first paint and user input are prioritized.
+    const deferredSetup = window.setTimeout(setup, 0)
 
     return () => {
-      observer.disconnect()
-      window.removeEventListener('hashchange', syncFromHash)
+      window.clearTimeout(deferredSetup)
+      cleanupObserver()
     }
   }, [])
 
